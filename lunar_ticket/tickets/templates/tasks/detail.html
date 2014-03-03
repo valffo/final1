@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Задача #{{ task.id }}</h1>
+<ul>
+    <li><b>Задача:</b> {{ task.task_title }}</li>
+    <li><b>Крайняя дата выполнения:</b> {{ task.deadline_date }}</li>
+    <li><b>Статус:</b> {% if task.done %} Выполнена {% endif %} </li>
+</ul>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+.standart {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    margin: 8px 0 0 30px;
+    width: 280px;
+}
+td, th{
+    background-image: none !important;
+    border: 1px solid #333333;
+    padding: 2px;
+    text-align: center;
+}
+th {
+    background-color: #FAF3D2;
+    white-space:nowrap;
+}
+ul.hr {
+    margin: 0;
+    padding: 4px;
+}
+ul.hr li {
+    display: inline;
+    margin-right: 5px;
+    border: 1px solid #000;
+    padding: 3px;
+}
