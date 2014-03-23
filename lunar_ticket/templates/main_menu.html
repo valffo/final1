@@ -1,10 +1,10 @@
 <div>
     <ul class="hr">
         <li><a href="{% url 'home' %}">Главная</a></li>
-        <li><a href="{% url 'tasks_index' 'someday' %}">Мои задачи</a></li>
+
         <li><a href="{% url 'auth_login' %}">Войти</a></li>
         <li><a href="{% url 'auth_logout' %}" onclick="return confirm('Точно хотите выйти?')">Выйти</a></li>
         <li><a href="{% url 'registration_register' %}">Регистрация</a></li>
-        <li><a href="{% url 'add' %}" >Добавить новую задачу</a></li>
+
     </ul>
 </div>

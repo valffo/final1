@@ -1,6 +1,6 @@
 from django import forms
 
-class TasksForm(forms.Form):
-    task_title = forms.CharField()
+class OrderForm(forms.Form):
+    ticket = forms.CharField()
     DATE_INPUT_FORMATS = 'd.m.Y'
-    deadline_date = forms.DateField()
+    date_purchase = forms.DateField()
