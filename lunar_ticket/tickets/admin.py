@@ -21,36 +21,6 @@ class PlayAdmin(admin.ModelAdmin):
     search_fields = ['title', 'describe']
 admin.site.register(Play, PlayAdmin)
 
-class SchedulerAdminForm(forms.ModelForm):
-    plays = forms.ModelMultipleChoiceField(
-        queryset=Play.objects.all(),
-        required=False,
-        widget=FilteredSelectMultiple(
-            verbose_name=_('Plays'),
-            is_stacked=False
-        )
-    )
-
-    class Meta:
-        model = Scheduler
-
-    def __init__(self, *args, **kwargs):
-        super(SchedulerAdminForm, self).__init__(*args, **kwargs)
-
-        if self.instance:
-          self.fields['play_id'].initial = self.instance.play.all()
-
-    def save(self, commit=True):
-        scheduler = super(SchedulerAdminForm, self).save(commit=False)
-
-        scheduler.plays = self.cleaned_data['play_id']
-
-        if commit:
-            scheduler.save()
-            scheduler.save_m2m()
-
-        return scheduler
-
 class SchedulerAdmin(admin.ModelAdmin):
     # ...
     list_select_related = ('play', )
@@ -60,7 +30,6 @@ class SchedulerAdmin(admin.ModelAdmin):
     def get_play(self, obj):
         return obj.play.title
     get_play.short_description = 'Plays'
-    #form = SchedulerAdminForm
 
 admin.site.register(Scheduler, SchedulerAdmin)
 

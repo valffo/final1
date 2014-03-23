@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 
-    {% url 'detail' %}
+
+{% for play in plays %}
+        {{ play }}
+{% endfor %}
 
 {% endblock %}

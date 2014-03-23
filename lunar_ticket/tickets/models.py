@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf.urls import patterns, url
+from django.core.urlresolvers import reverse
 
 class Play(models.Model):
     title = models.CharField(max_length=255)
@@ -16,6 +18,9 @@ class Scheduler(models.Model):
     time = models.TimeField()
     def __str__(self):
         return ' '.join([self.date.strftime('%d.%m.%Y'), self.time.strftime('%H:%M'), str(self.play)])
+    def get_absolute_url(self):
+        return reverse('detail', args=[self.id])
+
 
 class TicketType(models.Model):
     title = models.CharField(max_length=100)
