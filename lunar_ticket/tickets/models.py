@@ -29,9 +29,12 @@ class TicketType(models.Model):
         return ' '.join([self.title])
 
 class Ticket(models.Model):
-    play = models.ForeignKey(Scheduler)
+    scheduler = models.ForeignKey(Scheduler)
     ticket_type = models.ForeignKey(TicketType)
     cost = models.BigIntegerField()
+    def __str__(self):
+        return ' '.join([str(self.scheduler), 'for', str(self.ticket_type), 'for', str(self.cost)])
+
 
 class Order(models.Model):
     user = models.ForeignKey(User)

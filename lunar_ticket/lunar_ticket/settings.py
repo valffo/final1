@@ -68,7 +68,7 @@ WSGI_APPLICATION = 'lunar_ticket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tickets',
+        'NAME': 'ticket',
         'USER': 'root',
         'PASSWORD': '1',
         'HOST': 'localhost',

@@ -17,13 +17,14 @@ class PlayInline(admin.TabularInline):
 class PlayAdmin(admin.ModelAdmin):
     # ...
     list_display = ('title', 'describe',)
-    list_filter = ['title',]
+    list_filter = ['title', ]
     search_fields = ['title', 'describe']
 admin.site.register(Play, PlayAdmin)
 
 class SchedulerAdmin(admin.ModelAdmin):
     # ...
     list_select_related = ('play', )
+    list_select_related = ('tickets', )
     list_display = ('get_play', 'date', 'time')
     list_filter = ['date',]
     search_fields = ['date', 'play']
@@ -42,8 +43,8 @@ class TicketTypeAdmin(admin.ModelAdmin):
 admin.site.register(TicketType, TicketTypeAdmin)
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ('play', 'ticket_type', 'cost')
-    list_filter = ['play', 'ticket_type']
+    list_display = ('scheduler', 'ticket_type', 'cost')
+    list_filter = ['ticket_type']
 admin.site.register(Ticket, TicketAdmin)
 
 class OrderAdmin(admin.ModelAdmin):

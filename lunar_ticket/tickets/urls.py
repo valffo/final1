@@ -3,7 +3,7 @@ import views
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = patterns('',
-    url(r'^$', views.index, name='home'),
+    url(r'^(?P<month>(\d*))$', views.index, name='home'),
     url(r'^plays/$', views.plays, name='plays'),
     url(r'^detail/(?P<pk>\d+)/$', views.play_detail, name='detail'),
 )

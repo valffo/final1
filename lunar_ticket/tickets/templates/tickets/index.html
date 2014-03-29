@@ -1,7 +1,15 @@
 {% extends "base.html" %}
-        okokokoo
+
 {% block content %}
 
-{{ calendar }}
 
+
+<div>
+    <div style="display: inline; float: left;"><a href="{% url 'home' prev_month|date:'Ym' %}"><< Prev month </a></div>
+    <div style="display: inline; float: right;"><a href="{% url 'home' next_month|date:'Ym' %}"> Next month >> </a></div>
+    <div style="clear: both;"></div>
+    <div style="display: block; text-align: center;"><a href="{% url 'home' '' %}"> Now </a></div>
+</div>
+
+{{ calendar }}
 {% endblock %}

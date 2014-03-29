@@ -33,3 +33,7 @@ ul.calendar, li.calendar {
     padding: 0;
     margin: 0;
 }
+
+table td.today {
+    background-color: #d9eefa;
+}

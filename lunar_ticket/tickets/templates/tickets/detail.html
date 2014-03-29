@@ -5,5 +5,27 @@
     <li><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</li>
     <li><p> {{ scheduler.play.describe }}</p> </li>
 </ul>
-
+        {#% debug %#}
+<div>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Cost</th>
+            <th>Available</th>
+            <th></th>
+        </tr>
+        {{ okokok }}
+        {% for order in orders %}
+               <div> {{ order.count_ticket }} - {{ order.count }} рублей</div>
+        {% endfor %}
+        {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.ticket_type }}</td>
+                <td>{{ ticket.cost }}</td>
+                <td>{{ ticket.count }}</td>
+                <td><a href="">Buy</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}

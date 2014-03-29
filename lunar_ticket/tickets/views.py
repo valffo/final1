@@ -13,7 +13,10 @@ from django.shortcuts import render_to_response
 from django.utils.safestring import mark_safe
 from month_calendar import WorkoutCalendar
 from datetime import date
-
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
+from django.contrib.auth.models import User, Group
+from django.db.models import Count, Min, Sum, Avg
 
 # Create your views here.
 
@@ -26,21 +29,29 @@ ACTION_DELETE = {'delete': u"Удалить выбраные", }
 
 
 @login_required
-def index(request):
+def index(request, month):
     template = loader.get_template('tickets/index.html')
     my_workouts = Scheduler.objects.all()
-    today = date.today()
-
+    if (month):
+        calendar_date = datetime.strptime(month, "%Y%m")
+    else:
+        calendar_date = date.today()
     context = RequestContext(request, {
-        'calendar': calendar(request, today.year, today.month),
+        'calendar': calendar(request, calendar_date.year, calendar_date.month),
+        'next_month': calendar_date + relativedelta(months=+1),
+        'prev_month': calendar_date + relativedelta(months=-1),
     })
     return HttpResponse(template.render(context))
 
 def play_detail(request, pk):
     template = loader.get_template('tickets/detail.html')
+    scheduler = Scheduler.objects.get(pk=pk)
+    orders = Order.objects.values('ticket').filter(scheduler=scheduler)\
+        .annotate(count_ticket=Sum('count'))
     context = RequestContext(request, {
-        'scheduler': Scheduler.objects.get(pk=pk),
-        'pk': pk,
+        'scheduler': scheduler,
+        'orders': orders,
+        'tickets': Ticket.objects.filter(scheduler=scheduler)
 
     })
     return HttpResponse(template.render(context))
