@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>When: {{ scheduler.time|date:"f" }}  {{ scheduler.date }}</h1>
-<ul>
-    <li><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</li>
-    <li><p> {{ scheduler.play.describe }}</p> </li>
-</ul>
-        {#% debug %#}
+<h1>{{ scheduler.time|date:"H:i" }}  {{ scheduler.date }}</h1>
+    <h2><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</h2>
+    <p> {{ scheduler.play.describe }}</p>
+{% load apptags %}
 <div>
+    <form action="{% url 'buy' %}" method="post">
+        {% csrf_token %}
+
+        <input type="hidden" value="{{ scheduler.id }}" name="scheduler"/>
     <table>
         <tr>
             <th>Type</th>
@@ -14,18 +16,21 @@
             <th>Available</th>
             <th></th>
         </tr>
-        {{ okokok }}
-        {% for order in orders %}
-               <div> {{ order.count_ticket }} - {{ order.count }} рублей</div>
-        {% endfor %}
+
         {% for ticket in tickets %}
+        {% with availables|get:ticket.id as count_orders %}
             <tr>
                 <td>{{ ticket.ticket_type }}</td>
-                <td>{{ ticket.cost }}</td>
-                <td>{{ ticket.count }}</td>
-                <td><a href="">Buy</a></td>
+                <td>{{ ticket.cost }} рублей</td>
+
+                <td>{{ ticket.ticket_type.count|add:count_orders }} </td>
+
+                <td><input size="3" type="text" name="type[{{ ticket.ticket_type.id }}]"/></td>
             </tr>
+        {% endwith %}
         {% endfor %}
     </table>
+        <input type="submit" value="Add to cart"/>
+    </form>
 </div>
 {% endblock %}
