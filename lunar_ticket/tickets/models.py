@@ -42,3 +42,4 @@ class Order(models.Model):
     ticket = models.ForeignKey(Ticket)
     count = models.IntegerField()
     date_purchase = models.DateTimeField()
+    pay_status = models.IntegerField()

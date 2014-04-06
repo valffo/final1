@@ -7,7 +7,7 @@ urlpatterns = patterns('',
     url(r'^plays/$', views.plays, name='plays'),
     url(r'^detail/(?P<pk>\d+)/$', views.play_detail, name='detail'),
     url(r'^buy$', views.buy, name='buy'),
-    url(r'^cart', views.cart, name='cart'),
+    url(r'^cart(?P<pk>\d+)/$', views.cart, name='cart'),
 )
 
     # ex: /tickets/

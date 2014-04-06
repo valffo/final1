@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.template import RequestContext, loader
 from datetime import date
 
@@ -39,19 +39,15 @@ def index(request, month):
 def play_detail(request, pk):
     template = loader.get_template('tickets/detail.html')
     scheduler = Scheduler.objects.get(pk=pk)
-    orders = Order.objects.values('ticket').filter(scheduler=scheduler) \
-        .annotate(count_ticket=Sum('count'))
+    context = RequestContext(
+        request,
+        {
+            'scheduler': scheduler,
+            'form': OrderForm(scheduler=scheduler).as_table()
+        }
+    )
 
-    availables = {x['ticket']: x['count_ticket'] for x in orders}
-    context = RequestContext(request, {
-        'scheduler': scheduler,
-        'orders': orders,
-        'availables': availables,
-        'tickets': Ticket.objects.filter(scheduler=scheduler),
-        'form': form_order
-
-    })
-    return HttpResponse(template.render(context))
+    return StreamingHttpResponse(template.render(context))
 
 
 def plays(request, date):
@@ -62,49 +58,56 @@ def plays(request, date):
     return HttpResponse(template.render(context=context))
 
 
-def buy(request):
-    #if request.method == 'POST':
-        #for ticket_id, count in request.POST.getlist('type'):
-        #    order = Order(
-        #        scheduler=Scheduler.objects.get(request.POST['scheduler']),
-        #        user=User,
-        #        count=count,
-        #        date_purchase=datetime.date()
-        #    )
-        #    order.save()
+#def buy(request):
+#    #if request.method == 'POST':
+#        #for ticket_id, count in request.POST.getlist('type'):
+#        #    order = Order(
+#        #        scheduler=Scheduler.objects.get(request.POST['scheduler']),
+#        #        user=User,
+#        #        count=count,
+#        #        date_purchase=datetime.date()
+#        #    )
+#        #    order.save()
+#    template = loader.get_template('tickets/cart.html')
+#    context = RequestContext(request, {
+#        #'orders': Order.objects.filter(user=User),
+#        'orders': request.POST.getlist('type[]'),
+#        #'orders': request.POST['scheduler'],
+#
+#    })
+#    return HttpResponse(template.render(context))
+#    return HttpResponseRedirect(reverse('cart'))
+
+
+def cart(request, pk=None):
     template = loader.get_template('tickets/cart.html')
     context = RequestContext(request, {
-        #'orders': Order.objects.filter(user=User),
-        'orders': request.POST.getlist('type[]'),
-        #'orders': request.POST['scheduler'],
-
-    })
-    return HttpResponse(template.render(context))
-    return HttpResponseRedirect(reverse('cart'))
-
-def cart(request):
-    template = loader.get_template('tickets/detail.html')
-    context = RequestContext(request, {
         'orders': Order.objects.filter(user=User),
+        'pk': pk
     })
     return HttpResponse(template.render(context))
 
-def form_order(request):
+
+def buy(request):
+    pkkk=0
     if request.method == 'POST':
-        form = OrderForm(request.POST)
+        scheduler = Scheduler.objects.get(pk=request.POST['scheduler'])
+        form = OrderForm(request.POST, scheduler=scheduler)
         if form.is_valid():
-            for ticket_id, count in request.POST.list['']:
+            for ticket in form.changed_data:
+                ticket_id = ticket.split('_')[1]
+                #return StreamingHttpResponse(ticket+ '!!!' + ticket_id)
+                #print ticket_type
                 order = Order(
-                    scheduler=Scheduler.objects.get(request.POST['scheduler']),
-                    user=User,
-                    count=count,
-                    date_purchase=datetime.date()
+                    scheduler=scheduler,
+                    ticket=Ticket.objects.get(pk=ticket_id),
+                    user=User.objects.get(pk=request.user.id),
+                    count=request.POST[ticket],
+                    date_purchase=datetime.now()
                 )
                 order.save()
-            return HttpResponseRedirect(reverse('home', kwargs={'pk': order.scheduler.id, }))
-
-    return OrderForm()
-
+                pkkk = order.id
+    return HttpResponseRedirect(reverse('cart', kwargs={'pk': pkkk, }))
 
 def calendar(request, year, month):
     my_workouts = Scheduler.objects.order_by('date').filter(

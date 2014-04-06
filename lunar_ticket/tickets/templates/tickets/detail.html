@@ -8,29 +8,14 @@
     <form action="{% url 'buy' %}" method="post">
         {% csrf_token %}
 
-        <input type="hidden" value="{{ scheduler.id }}" name="scheduler"/>
-    <table>
-        <tr>
-            <th>Type</th>
-            <th>Cost</th>
-            <th>Available</th>
-            <th></th>
-        </tr>
-
-        {% for ticket in tickets %}
-        {% with availables|get:ticket.id as count_orders %}
+        <table>
             <tr>
-                <td>{{ ticket.ticket_type }}</td>
-                <td>{{ ticket.cost }} рублей</td>
-
-                <td>{{ ticket.ticket_type.count|add:count_orders }} </td>
-
-                <td><input size="3" type="text" name="type[{{ ticket.ticket_type.id }}]"/></td>
-            </tr>
-        {% endwith %}
-        {% endfor %}
-    </table>
-        <input type="submit" value="Add to cart"/>
+                <th>Ticket</th>
+                <th>Choice</th>
+            <tr/>
+            {{form}}
+        </table>
+    <input type="submit" value="Add to cart"/>
     </form>
 </div>
 {% endblock %}
