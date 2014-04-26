@@ -21,6 +21,8 @@ python manage.py sql tasks
 
 ALTER DATABASE ticket CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ALTER TABLE django_admin_log MODIFY object_repr VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
+ALTER TABLE `tickets_play` MODIFY `title` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
+ALTER TABLE `tickets_play` MODIFY `describe` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
 python manage.py syncdb
 
 $ python manage.py runserver
