@@ -6,7 +6,7 @@ from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from models import *
-from forms import OrderForm
+from forms import *
 from django.views import generic
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -20,7 +20,6 @@ from django.db.models import Count, Min, Sum, Avg
 
 
 
-@login_required
 def index(request, month):
     template = loader.get_template('tickets/index.html')
     my_workouts = Scheduler.objects.all()
@@ -37,13 +36,20 @@ def index(request, month):
 
 
 def play_detail(request, pk):
-    template = loader.get_template('tickets/detail.html')
     scheduler = Scheduler.objects.get(pk=pk)
+    if (request.user.groups.filter(name='carrier').count):
+        template = loader.get_template('tickets/carrier.html')
+        form = CurrierForm(scheduler=scheduler, request=request).as_table()
+    else:
+        template = loader.get_template('tickets/detail.html')
+        form = OrderForm(scheduler=scheduler, request=request).as_table()
+
+
     context = RequestContext(
         request,
         {
             'scheduler': scheduler,
-            'form': OrderForm(scheduler=scheduler).as_table()
+            'form': form
         }
     )
 
@@ -56,27 +62,6 @@ def plays(request, date):
         'plays': Play.objects.all(),
     })
     return HttpResponse(template.render(context=context))
-
-
-#def buy(request):
-#    #if request.method == 'POST':
-#        #for ticket_id, count in request.POST.getlist('type'):
-#        #    order = Order(
-#        #        scheduler=Scheduler.objects.get(request.POST['scheduler']),
-#        #        user=User,
-#        #        count=count,
-#        #        date_purchase=datetime.date()
-#        #    )
-#        #    order.save()
-#    template = loader.get_template('tickets/cart.html')
-#    context = RequestContext(request, {
-#        #'orders': Order.objects.filter(user=User),
-#        'orders': request.POST.getlist('type[]'),
-#        #'orders': request.POST['scheduler'],
-#
-#    })
-#    return HttpResponse(template.render(context))
-#    return HttpResponseRedirect(reverse('cart'))
 
 
 def cart(request, pk=None):
@@ -92,7 +77,7 @@ def buy(request):
     pkkk=0
     if request.method == 'POST':
         scheduler = Scheduler.objects.get(pk=request.POST['scheduler'])
-        form = OrderForm(request.POST, scheduler=scheduler)
+        form = OrderForm(request.POST, scheduler=scheduler, request=request)
         if form.is_valid():
             for ticket in form.changed_data:
                 ticket_id = ticket.split('_')[1]
@@ -107,7 +92,23 @@ def buy(request):
                 )
                 order.save()
                 pkkk = order.id
-    return HttpResponseRedirect(reverse('cart', kwargs={'pk': pkkk, }))
+    return HttpResponseRedirect(reverse('detail', kwargs={'pk': request.POST['scheduler'], }))
+
+def pay(request):
+    if request.method == 'POST':
+        scheduler = Scheduler.objects.get(pk=request.POST['scheduler'])
+        form = CurrierForm(request.POST, scheduler=scheduler, request=request)
+        if form.is_valid():
+            for order_post in form.changed_data:
+                order_id = order_post.split('_')[1]
+                # return StreamingHttpResponse(request.POST[order_post] + ' === ' + order_post+ '!!!' + order_id)
+                # print ticket_type
+                order = Order.objects.get(pk=order_id)
+                order.count = request.POST[order_post]
+                order.pay_status = 1
+                order.save()
+                pkkk = order.id
+    return HttpResponseRedirect(reverse('detail', kwargs={'pk': request.POST['scheduler'], }))
 
 def calendar(request, year, month):
     my_workouts = Scheduler.objects.order_by('date').filter(

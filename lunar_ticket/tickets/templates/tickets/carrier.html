@@ -4,22 +4,26 @@
     <h2><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</h2>
     <p> {{ scheduler.play.describe }}</p>
 {% load apptags %}
-        {{is_carrier}}
+
 <div>
-    <form action="{% url 'buy' %}" method="post">
+    <form action="{% url 'pay' %}" method="post">
         {% csrf_token %}
 
         <table>
             <tr>
-                <th>Ticket</th>
-                <th>Cost(rub)</th>
-                <th>Available</th>
+                <th>Play</th>
+                <th>Login</th>
+                <th>Ticket type</th>
+                <th>Purchase date</th>
                 <th>Ordered</th>
-                <th>Choice</th>
+                <th>Sum</th>
+                <th>Status</th>
+                <th>Quantity</th>
             <tr/>
             {{form}}
         </table>
-    <input type="submit" value="Add to cart"/>
+    <input type="submit" value="Pay orders"/>
+    <input type="submit" value="Cancel orders"/>
     </form>
 </div>
 {% endblock %}

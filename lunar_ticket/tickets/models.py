@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 
 class Play(models.Model):
     title = models.CharField(max_length=255)
@@ -42,4 +43,4 @@ class Order(models.Model):
     ticket = models.ForeignKey(Ticket)
     count = models.IntegerField()
     date_purchase = models.DateTimeField()
-    pay_status = models.IntegerField()
+    pay_status = models.IntegerField(default=0)
