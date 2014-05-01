@@ -10,8 +10,8 @@ class CurrierForm(forms.Form):
         scheduler = kwargs.get('scheduler')
         del kwargs['request']
         del kwargs['scheduler']
-        super(CurrierForm, self).__init__(*args, **kwargs)
-        orders = Order.objects.filter(scheduler=scheduler)
+        super(CurrierForm, self).__init__(label_suffix='', *args, **kwargs)
+        orders = Order.objects.filter(scheduler=scheduler, count__gt=0)
 
         self.fields['scheduler'] = forms.IntegerField(widget=forms.HiddenInput(), initial=scheduler.id)
         for order in orders:
@@ -24,15 +24,22 @@ class CurrierForm(forms.Form):
                     str(order.date_purchase),
                     str(order.count),
                     str(order.count * order.ticket.cost),
-                    'payed' if order.pay_status else 'not payed'
+                    'payed</td><td>' if order.pay_status else 'not payed'
 
 
                 ]
             ))
             if (order.pay_status):
                 attrs={'disabled': 'disabled'}
-            # self.fields[''.join(['order_', str(order.id)])] = forms.BooleanField(label=label)
-            self.fields[''.join(['order_', str(order.id)])] = forms.IntegerField(label=label, required=False, widget=forms.NumberInput(attrs=attrs))
+                self.fields[''.join(['orderCancel_', str(order.id)])] = forms.BooleanField(label=label, required=False)
+            else:
+                self.fields[''.join(['orderPay_', str(order.id)])] = forms.IntegerField(
+                    label=label,
+                    required=False,
+                    min_value=0,
+                    max_value=order.count,
+                    widget=forms.NumberInput(attrs=attrs)
+                )
 
 class OrderForm(forms.Form):
 
@@ -55,7 +62,7 @@ class OrderForm(forms.Form):
                     str(self.get_order_count_by_ticket(user, options['scheduler'], ticket))
                 ]
             ))
-            self.fields[''.join(['ticket_', str(ticket.id)])] = forms.IntegerField(
+            self.fields['_'.join(['ticket', str(ticket.id)])] = forms.IntegerField(
                 label=label,
                 max_value=ticket.ticket_type.count - int(options['availables'].get(ticket.id, 0)),
                 min_value=0,

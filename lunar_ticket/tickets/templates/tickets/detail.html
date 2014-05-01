@@ -4,7 +4,7 @@
     <h2><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</h2>
     <p> {{ scheduler.play.describe }}</p>
 {% load apptags %}
-        {{is_carrier}}
+
 <div>
     <form action="{% url 'buy' %}" method="post">
         {% csrf_token %}

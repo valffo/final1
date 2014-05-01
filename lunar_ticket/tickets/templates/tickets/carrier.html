@@ -6,6 +6,9 @@
 {% load apptags %}
 
 <div>
+    <h2>
+        Currier panel
+    </h2>
     <form action="{% url 'pay' %}" method="post">
         {% csrf_token %}
 
@@ -19,6 +22,7 @@
                 <th>Sum</th>
                 <th>Status</th>
                 <th>Quantity</th>
+                <th>Cancel pay</th>
             <tr/>
             {{form}}
         </table>
@@ -26,4 +30,5 @@
     <input type="submit" value="Cancel orders"/>
     </form>
 </div>
+        <a href="{% url 'report' scheduler.id %}">Report</a>
 {% endblock %}

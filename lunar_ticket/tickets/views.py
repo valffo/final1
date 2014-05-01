@@ -37,13 +37,12 @@ def index(request, month):
 
 def play_detail(request, pk):
     scheduler = Scheduler.objects.get(pk=pk)
-    if (request.user.groups.filter(name='carrier').count):
+    if (request.user.groups.filter(name='carrier').count()):
         template = loader.get_template('tickets/carrier.html')
         form = CurrierForm(scheduler=scheduler, request=request).as_table()
     else:
         template = loader.get_template('tickets/detail.html')
         form = OrderForm(scheduler=scheduler, request=request).as_table()
-
 
     context = RequestContext(
         request,
@@ -74,7 +73,6 @@ def cart(request, pk=None):
 
 
 def buy(request):
-    pkkk=0
     if request.method == 'POST':
         scheduler = Scheduler.objects.get(pk=request.POST['scheduler'])
         form = OrderForm(request.POST, scheduler=scheduler, request=request)
@@ -91,7 +89,6 @@ def buy(request):
                     date_purchase=datetime.now()
                 )
                 order.save()
-                pkkk = order.id
     return HttpResponseRedirect(reverse('detail', kwargs={'pk': request.POST['scheduler'], }))
 
 def pay(request):
@@ -100,15 +97,28 @@ def pay(request):
         form = CurrierForm(request.POST, scheduler=scheduler, request=request)
         if form.is_valid():
             for order_post in form.changed_data:
-                order_id = order_post.split('_')[1]
-                # return StreamingHttpResponse(request.POST[order_post] + ' === ' + order_post+ '!!!' + order_id)
-                # print ticket_type
+                action, order_id = order_post.split('_')
                 order = Order.objects.get(pk=order_id)
-                order.count = request.POST[order_post]
-                order.pay_status = 1
+                if (action == 'orderCancel'):
+                    order.pay_status = 0
+                else:
+                    order.pay_status = 1
+                    order.count = request.POST[order_post]
                 order.save()
-                pkkk = order.id
     return HttpResponseRedirect(reverse('detail', kwargs={'pk': request.POST['scheduler'], }))
+
+def report(request, pk):
+    scheduler = Scheduler.objects.get(pk=pk)
+    template = loader.get_template('tickets/report.html')
+
+    context = RequestContext(
+        request,
+        {
+            'scheduler': scheduler,
+        }
+    )
+
+    return StreamingHttpResponse(template.render(context))
 
 def calendar(request, year, month):
     my_workouts = Scheduler.objects.order_by('date').filter(

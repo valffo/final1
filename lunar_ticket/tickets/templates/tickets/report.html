@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ scheduler.time|date:"H:i" }}  {{ scheduler.date }}</h1>
+    <h2><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</h2>
+    <p> {{ scheduler.play.describe }}</p>
+
+<h2>Reports</h2>
+<table>
+    <tr>
+        <th>Ticket type</th>
+        <th>Quantity</th>
+        <th>Payed</th>
+        <th>Not payed</th>
+        <th>Not ordered</th>
+        <th>Sum</th>
+    </tr>
+
+    <tr><td colspan="4"></td><td>All:</td><td></td></tr>
+</table>
+
+<h2>Report by users</h2>
+<table>
+    <tr>
+        <th>User name</th>
+        <th>Ticket type</th>
+        <th>Order date</th>
+        <th>Quantity</th>
+        <th>Cost</th>
+        <th>Sum</th>
+    </tr>
+
+    <tr><td colspan="4"></td><td>All:</td><td></td></tr>
+</table>
+
+{% endblock %}
