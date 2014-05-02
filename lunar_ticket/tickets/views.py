@@ -37,7 +37,11 @@ def index(request, month):
 
 def play_detail(request, pk):
     scheduler = Scheduler.objects.get(pk=pk)
-    if (request.user.groups.filter(name='carrier').count()):
+    form = tickets = False
+    if (request.user.is_anonymous()):
+        template = loader.get_template('tickets/anonymous.html')
+        tickets = Ticket.objects.filter(scheduler=scheduler)
+    elif (request.user.groups.filter(name='carrier').count()):
         template = loader.get_template('tickets/carrier.html')
         form = CurrierForm(scheduler=scheduler, request=request).as_table()
     else:
@@ -48,7 +52,8 @@ def play_detail(request, pk):
         request,
         {
             'scheduler': scheduler,
-            'form': form
+            'form': form,
+            'tickets': tickets,
         }
     )
 

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ scheduler.time|date:"H:i" }}  {{ scheduler.date }}</h1>
+    <h2><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</h2>
+    <p> {{ scheduler.play.describe }}</p>
+{% load apptags %}
+
+<div>
+    <h2>
+        Tickets
+    </h2>
+
+        <table>
+            <tr>
+                <th>Ticket type</th>
+                <th>Quantity</th>
+                <th>Cost</th>
+            </tr>
+            {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.ticket_type.title }}</td>
+                    <td>{{ ticket.available }}</td>
+                    <td>{{ ticket.cost }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+</div>
+        <a href="{% url 'report' scheduler.id %}">Report</a>
+{% endblock %}

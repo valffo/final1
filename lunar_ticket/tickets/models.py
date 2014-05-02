@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Min, Sum, Avg
 
 class Play(models.Model):
     title = models.CharField(max_length=255)
@@ -33,6 +34,13 @@ class Ticket(models.Model):
     scheduler = models.ForeignKey(Scheduler)
     ticket_type = models.ForeignKey(TicketType)
     cost = models.BigIntegerField()
+
+    def available(self):
+        count = Order.objects.values('ticket').filter(scheduler=self.scheduler, ticket=self) \
+            .annotate(count_ticket=Sum('count'))
+        return self.ticket_type.count - count[0].get('count_ticket', 0)
+
+
     def __str__(self):
         return ' '.join([str(self.scheduler), 'for', str(self.ticket_type), 'for', str(self.cost)])
 
