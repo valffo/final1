@@ -4,6 +4,7 @@ from models import *
 from django.db.models import Count, Min, Sum, Avg
 from django.utils.safestring import mark_safe
 
+
 class CurrierForm(forms.Form):
     def __init__(self, *args, **kwargs):
         request = kwargs.get('request')
@@ -24,9 +25,7 @@ class CurrierForm(forms.Form):
                     str(order.date_purchase),
                     str(order.count),
                     str(order.count * order.ticket.cost),
-                    'payed</td><td>' if order.pay_status else 'not payed'
-
-
+                    'paid</td><td>' if order.pay_status else 'not paid'
                 ]
             ))
             if (order.pay_status):
@@ -40,6 +39,7 @@ class CurrierForm(forms.Form):
                     max_value=order.count,
                     widget=forms.NumberInput(attrs=attrs)
                 )
+
 
 class OrderForm(forms.Form):
 

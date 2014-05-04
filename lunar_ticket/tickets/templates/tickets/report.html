@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load apptags %}
 {% block content %}
 <h1>{{ scheduler.time|date:"H:i" }}  {{ scheduler.date }}</h1>
     <h2><b>Play:</b> {{ scheduler.play.id }} {{ scheduler.play.title }}</h2>
@@ -9,16 +10,26 @@
     <tr>
         <th>Ticket type</th>
         <th>Quantity</th>
-        <th>Payed</th>
-        <th>Not payed</th>
+        <th>Paid</th>
+        <th>Not paid</th>
         <th>Not ordered</th>
         <th>Sum</th>
     </tr>
 
-    <tr><td colspan="4"></td><td>All:</td><td></td></tr>
+    {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.ticket_type.title }}</td>
+            <td>{{ ticket.ticket_type.count }}</td>
+            <td>{{ ticket.count_paid }}</td>
+            <td>{{ ticket.count_not_paid }}</td>
+            <td>{{ ticket.available }}</td>
+            <td>{{ ticket.cost|multiply:ticket.count_paid }}</td>
+        </tr>
+    {% endfor %}
+    <tr><td colspan="4"></td><td>All:</td><td>{{ g_sum }}</td></tr>
 </table>
 
-<h2>Report by users</h2>
+<h2>Report not paid ticket users</h2>
 <table>
     <tr>
         <th>User name</th>
@@ -28,8 +39,17 @@
         <th>Cost</th>
         <th>Sum</th>
     </tr>
-
-    <tr><td colspan="4"></td><td>All:</td><td></td></tr>
+    {% for order in orders %}
+        <tr>
+            <td>{{ order.user.username }}</td>
+            <td>{{ order.ticket.ticket_type.title }}</td>
+            <td>{{ order.date_purchase }}</td>
+            <td>{{ order.count }}</td>
+            <td>{{ order.ticket.cost }}</td>
+            <td>{{ order.ticket.cost|multiply:order.count }}</td>
+        </tr>
+    {% endfor %}
+    <tr><td colspan="4"></td><td>All:</td><td>{{ n_sum }}</td></tr>
 </table>
 
 {% endblock %}

@@ -17,7 +17,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from django.contrib.auth.models import User, Group
 from django.db.models import Count, Min, Sum, Avg
-
+from django.db.models.query import QuerySet
 
 
 def index(request, month):
@@ -38,10 +38,10 @@ def index(request, month):
 def play_detail(request, pk):
     scheduler = Scheduler.objects.get(pk=pk)
     form = tickets = False
-    if (request.user.is_anonymous()):
+    if request.user.is_anonymous():
         template = loader.get_template('tickets/anonymous.html')
         tickets = Ticket.objects.filter(scheduler=scheduler)
-    elif (request.user.groups.filter(name='carrier').count()):
+    elif request.user.groups.filter(name='carrier').count():
         template = loader.get_template('tickets/carrier.html')
         form = CurrierForm(scheduler=scheduler, request=request).as_table()
     else:
@@ -96,6 +96,7 @@ def buy(request):
                 order.save()
     return HttpResponseRedirect(reverse('detail', kwargs={'pk': request.POST['scheduler'], }))
 
+
 def pay(request):
     if request.method == 'POST':
         scheduler = Scheduler.objects.get(pk=request.POST['scheduler'])
@@ -112,18 +113,24 @@ def pay(request):
                 order.save()
     return HttpResponseRedirect(reverse('detail', kwargs={'pk': request.POST['scheduler'], }))
 
+
 def report(request, pk):
     scheduler = Scheduler.objects.get(pk=pk)
     template = loader.get_template('tickets/report.html')
-
+    tickets = Ticket.objects.filter(scheduler=scheduler)
+    orders = Order.objects.filter(scheduler=scheduler, pay_status=0).order_by('user', 'ticket')
     context = RequestContext(
         request,
         {
             'scheduler': scheduler,
+            'tickets': tickets,
+            'orders': orders,
+            'g_sum': sum((t.count_paid()*t.cost for t in tickets)),
+            'n_sum': sum((t.count*t.ticket.cost for t in orders)),
         }
     )
-
     return StreamingHttpResponse(template.render(context))
+
 
 def calendar(request, year, month):
     my_workouts = Scheduler.objects.order_by('date').filter(
